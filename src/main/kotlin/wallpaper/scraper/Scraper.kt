@@ -41,7 +41,7 @@ object Scraper {
     }
 
     fun getDriveService(credential: Credential): Drive = Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
-            .setApplicationName("Anime Wallpaper wallpaper.scraper.Scraper")
+            .setApplicationName("Anime Wallpaper Scraper")
             .build()
 
     fun getImages(driveAPI: Drive): FileList {
