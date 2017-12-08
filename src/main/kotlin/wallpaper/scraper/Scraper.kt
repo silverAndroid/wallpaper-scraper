@@ -37,9 +37,7 @@ object Scraper {
                 .setDataStoreFactory(DATA_STORE_FACTORY)
                 .setAccessType("offline")
                 .build()
-        val credential = AuthorizationCodeInstalledApp(flow, LocalServerReceiver()).authorize("user")
-        System.out.println("Credentials saved to ${DATA_STORE_DIR.absolutePath}")
-        return credential
+        return AuthorizationCodeInstalledApp(flow, LocalServerReceiver()).authorize("user")
     }
 
     fun getDriveService(credential: Credential): Drive = Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
@@ -69,8 +67,8 @@ object Scraper {
         localFile.createNewFile()
 
         val outputStream = FileOutputStream(localFile)
-        driveAPI.Files().get(file.id)
-                .executeMediaAndDownloadTo(outputStream)
+        driveAPI.Files().get(file.id).executeMediaAndDownloadTo(outputStream)
+        println("Completed downloading ${file.name}")
     }
 
     private fun createFolder(path: String) {
