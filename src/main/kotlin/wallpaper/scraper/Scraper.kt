@@ -13,6 +13,8 @@ import com.google.api.services.drive.Drive
 import com.google.api.services.drive.DriveScopes
 import com.google.api.services.drive.model.File
 import com.google.api.services.drive.model.FileList
+import kotlinx.coroutines.experimental.Job
+import kotlinx.coroutines.experimental.launch
 import java.io.FileOutputStream
 import java.io.InputStreamReader
 
@@ -52,10 +54,12 @@ object Scraper {
         return query.execute()
     }
 
-    fun downloadImages(driveAPI: Drive, fileList: FileList) {
+    fun downloadImages(driveAPI: Drive, fileList: FileList): List<Job> {
         val files = fileList["files"] as List<File>
-        files.forEach {
-            downloadImage(driveAPI, it)
+        return files.map {
+            launch {
+                downloadImage(driveAPI, it)
+            }
         }
     }
 

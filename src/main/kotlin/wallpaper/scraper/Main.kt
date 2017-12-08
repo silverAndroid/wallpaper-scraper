@@ -1,5 +1,7 @@
 package wallpaper.scraper
 
+import kotlinx.coroutines.experimental.runBlocking
+
 object Main {
     @JvmStatic
     fun main(args: Array<String>) {
@@ -7,6 +9,9 @@ object Main {
         val service = Scraper.getDriveService(credentials)
 
         val list = Scraper.getImages(service)
-        Scraper.downloadImages(service, list)
+        val coroutines = Scraper.downloadImages(service, list)
+        runBlocking {
+            coroutines.forEach { it.join() }
+        }
     }
 }
