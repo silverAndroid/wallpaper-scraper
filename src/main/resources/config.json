@@ -1,0 +1,11 @@
+{
+  "providers": [
+    {
+      "name": "g-drive",
+      "images": [
+        "folder:0B6eB1SQ3pEV1Uzk5UV9aSmRScUU"
+      ]
+    }
+  ],
+  "wallpapersFolderPath": "./wallpapers"
+}
