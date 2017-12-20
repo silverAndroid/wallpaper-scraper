@@ -12,8 +12,8 @@ import com.google.api.client.util.store.FileDataStoreFactory
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.DriveScopes
 import com.google.api.services.drive.model.File
-import kotlinx.coroutines.experimental.Job
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.Deferred
+import kotlinx.coroutines.experimental.async
 import java.io.FileOutputStream
 import java.io.InputStreamReader
 
@@ -24,7 +24,7 @@ object DriveScraper: Scraper<Credential, Drive> {
 
     private val DATA_STORE_DIR = java.io.File(System.getProperty("user.home"), ".credentials/wallpaper-scraper")
     private val DATA_STORE_FACTORY: FileDataStoreFactory = FileDataStoreFactory(DATA_STORE_DIR)
-    private val folder = "./wallpapers"
+    private val folderPath = "./wallpapers"
 
     override fun authorize(): Credential {
         // Load client secrets.
@@ -52,22 +52,27 @@ object DriveScraper: Scraper<Credential, Drive> {
         return files.map { Image(it.id, it.name) }
     }
 
-    override fun downloadImages(api: Drive, images: List<Image>): List<Job> {
+    override fun downloadImages(api: Drive, images: List<Image>): List<Deferred<java.io.File>> {
         return images.map {
-            launch {
+            async {
                 downloadImage(api, it)
             }
         }
     }
 
-    private fun downloadImage(driveAPI: Drive, image: Image) {
-        createFolder(folder)
-        val localFile = java.io.File("$folder/${image.name}")
+    private fun downloadImage(driveAPI: Drive, image: Image): java.io.File {
+        createFolder(folderPath)
+        val localFile = java.io.File("$folderPath/${image.name}")
+        if (localFile.exists())
+            return localFile
+
         localFile.createNewFile()
 
         val outputStream = FileOutputStream(localFile)
         driveAPI.Files().get(image.id).executeMediaAndDownloadTo(outputStream)
         println("Completed downloading ${image.name}")
+
+        return localFile
     }
 
     private fun createFolder(path: String) {
